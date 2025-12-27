@@ -3,62 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Casino Online</title>
+    <title>Casino Royale Online</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Poppins:wght@300;400;600;900&family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="intro-screen">
         <div class="glow-circle">
-            <h1 class="brand-name">casino</h1>
+            <h1 class="brand-name">ROYALE</h1>
         </div>
     </div>
 
     <div id="start-screen" class="container wide-container hidden">
-        <h1 class="casino-title" style="font-size: 36px; margin-bottom: 10px;">OYUN DÜNYASI</h1>
-        <p style="color:#bdc3c7; margin-bottom: 30px;">Kazanmaya başlamak için favori oyununu seç.</p>
-        
+        <h1 class="casino-title">CASINO ROYALE</h1>
+        <p style="color:#bdc3c7; margin-bottom: 50px; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; opacity: 0.7;">
+            Sınırsız Eğlence • Gerçek Kazanç
+        </p>
         <div class="games-grid">
             <div class="game-card slot-card">
-                <div class="icon">🎰</div>
-                <h3>SLOT MACHINE</h3>
+                <div class="icon"><i class="fa-solid fa-dice"></i></div>
+                <h3>VIP SLOTS</h3>
             </div>
             <div class="game-card blackjack-card">
-                <div class="icon">♠️</div>
-                <h3>BLACKJACK</h3>
+                <div class="icon"><i class="fa-solid fa-diamond"></i></div>
+                <h3>PRO BLACKJACK</h3>
             </div>
             <div class="game-card roulette-card">
-                <div class="icon">🎡</div>
-                <h3>RULET</h3>
+                <div class="icon"><i class="fa-solid fa-dharmachakra"></i></div>
+                <h3>ELITE RULET</h3>
             </div>
         </div>
-        
-        <button onclick="goToLoginScreen()" class="big-start-btn">GİRİŞ YAP VE OYNA</button>
+        <button onclick="goToLoginScreen()" class="pulse-btn">GİRİŞ YAP VE KAZAN</button>
     </div>
 
     <div id="login-container" class="container hidden">
-        <h1 class="casino-title">GİRİŞ YAP</h1>
+        <h1 class="casino-title" style="font-size: 32px;">GİRİŞ YAP</h1>
         <div class="form-group">
             <input type="text" id="login-username" placeholder="Kullanıcı Adı">
         </div>
         <div class="form-group">
             <input type="password" id="login-password" placeholder="Şifre">
         </div>
-        <button onclick="login()">GİRİŞ YAP</button>
+        <button onclick="login()" class="pulse-btn">GİRİŞ YAP</button>
         <p class="toggle-text">Hesabın yok mu? <span onclick="showRegister()">Hemen Kayıt Ol</span></p>
-        <button onclick="goBackToStart()" style="background-color: #7f8c8d; margin-top: 5px;">Geri Dön</button>
+        <button onclick="goBackToStart()" class="back-btn">ANA EKRANA DÖN</button>
         <p id="login-error" class="error"></p>
     </div>
 
     <div id="register-container" class="container hidden">
-        <h1 class="casino-title">KAYIT OL</h1>
+        <h1 class="casino-title" style="font-size: 32px;">KAYIT OL</h1>
         <input type="text" id="reg-username" placeholder="Kullanıcı Adı">
         <input type="email" id="reg-email" placeholder="E-posta">
         <input type="text" id="reg-credit" placeholder="Kredi Kartı No">
+        <input type="number" id="reg-amount" placeholder="Yüklenecek Tutar (TL)" min="1">
         <input type="password" id="reg-password" placeholder="Şifre">
-        <button onclick="registerUser()">HESAP OLUŞTUR</button>
+        <button onclick="registerUser()" class="pulse-btn">HESAP OLUŞTUR</button>
         <p class="toggle-text">Zaten hesabın var mı? <span onclick="showLogin()">Giriş Yap</span></p>
-        <button onclick="goBackToStart()" style="background-color: #7f8c8d; margin-top: 5px;">Geri Dön</button>
+        <button onclick="goBackToStart()" class="back-btn">ANA EKRANA DÖN</button>
         <p id="reg-error" class="error"></p>
         <p id="reg-success" class="success"></p>
     </div>
@@ -66,65 +70,259 @@
     <div id="game-screen" class="container wide-container hidden">
         
         <div class="header">
-            <div style="float:left; font-size:18px;">👤 <span id="welcome-msg">Misafir</span></div>
-            <div class="balance-box">💰 <span id="balance">0</span> TL</div>
-            <div style="clear:both;"></div>
+            <div class="user-info">
+                <i class="fa-solid fa-crown" style="color:#f1c40f;"></i> 
+                <span id="welcome-msg" style="color:white; font-weight:bold;">Misafir</span>
+            </div>
+            <div class="right-panel">
+                <div class="balance-box">
+                    <i class="fa-solid fa-wallet"></i> <span id="balance">0</span> TL
+                </div>
+                <button onclick="location.reload()" class="header-logout-btn" title="Güvenli Çıkış">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </div>
         </div>
 
         <div id="lobby-view">
-            <p style="text-align:left; color:#bdc3c7; margin-bottom:20px; font-size:14px;">Oyun seçmek için kutucuğa tıklayınız:</p>
-            
+            <p style="text-align:center; color:#aab7b8; margin-bottom:30px; font-size:13px; letter-spacing:1px; opacity:0.8;">
+                 FAVORİ OYUNUNU SEÇ VE KAZANMAYA BAŞLA
+            </p>
             <div class="lobby-grid">
-                
                 <div class="lobby-card card-slot" onclick="openGame('slot')">
-                    <div class="card-icon">🎰</div>
-                    <h3>SLOT</h3>
+                    <div class="card-icon"><i class="fa-solid fa-dice"></i></div>
+                    <h3>VIP SLOTS</h3>
                     <div class="play-btn-small">OYNA</div>
                 </div>
-
                 <div class="lobby-card card-bj" onclick="openGame('bj')">
-                    <div class="card-icon">♠️</div>
-                    <h3>BLACKJACK</h3>
+                    <div class="card-icon"><i class="fa-solid fa-diamond"></i></div>
+                    <h3>PRO BLACKJACK</h3>
                     <div class="play-btn-small">OYNA</div>
                 </div>
-
                 <div class="lobby-card card-roulette" onclick="openGame('roulette')">
-                    <div class="card-icon">🎡</div>
-                    <h3>RULET</h3>
+                    <div class="card-icon"><i class="fa-solid fa-dharmachakra"></i></div>
+                    <h3>ELITE RULET</h3>
                     <div class="play-btn-small">OYNA</div>
                 </div>
-
             </div>
-            
-            <button onclick="location.reload()" class="logout-btn" style="margin-top:40px;">Çıkış Yap</button>
         </div>
 
         <div id="view-slot" class="game-view hidden">
-            <button onclick="backToLobby()" class="back-btn">⬅ Lobiye Dön</button>
-            <h2 style="color:#f1c40f; margin-top:10px;">🎰 SUPER SLOT</h2>
-            <div class="game-placeholder slot-bg">
-                [ SLOT MAKİNESİ DÖNÜYOR... ]
+            <button onclick="backToLobby()" class="back-btn" style="float:left; width:auto; margin:0 0 10px 0;"><i class="fa-solid fa-chevron-left"></i> Lobiye Dön</button>
+            <div style="clear:both"></div>
+            
+            <div class="slot-machine-wrapper">
+                <div class="game-container">
+                    <div class="top-bar-slot">
+                        <div class="game-title-slot" data-text="PASHA SLOT">PASHA SLOT</div>
+                    </div>
+                    <div class="main-frame">
+                        <div class="screen-window">
+                            <div class="middle-frame-overlay"></div>
+                            <div class="reels-grid">
+                                <div class="reel-col">
+                                    <div class="symbol-slot row1">🍋</div>
+                                    <div class="symbol-slot row2">🍒</div>
+                                    <div class="symbol-slot row3">🔔</div>
+                                </div>
+                                <div class="reel-col">
+                                    <div class="symbol-slot row1">💎</div>
+                                    <div class="symbol-slot row2">7️⃣</div>
+                                    <div class="symbol-slot row3">🍋</div>
+                                </div>
+                                <div class="reel-col">
+                                    <div class="symbol-slot row1">🔔</div>
+                                    <div class="symbol-slot row2">🍒</div>
+                                    <div class="symbol-slot row3">💎</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bottom-controls">
+                        <div class="left-buttons">
+                            <button class="yellow-btn" onclick="togglePayTable()">TABLO</button>
+                            <button class="yellow-btn" onclick="maxBet()">MAX BET</button>
+                        </div>
+                        <div class="display-panel">
+                            <div class="display-box green-box bet-control">
+                                <span class="label">BAHİS</span>
+                                <div class="bet-adjust">
+                                    <button class="adj-btn" onclick="changeBet(-10)">-</button>
+                                    <span class="value" id="bet-val">10</span>
+                                    <button class="adj-btn" onclick="changeBet(10)">+</button>
+                                </div>
+                            </div>
+                            <div class="display-box green-box total-win">
+                                <span class="label">KAZANÇ</span>
+                                <span class="value" id="win-val">0</span>
+                            </div>
+                        </div>
+                        <div class="spin-container">
+                            <button id="spin-btn" onclick="spin()">SPIN</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div id="view-bj" class="game-view hidden">
-            <button onclick="backToLobby()" class="back-btn">⬅ Lobiye Dön</button>
-            <h2 style="color:#2ecc71; margin-top:10px;">♠️ BLACKJACK 21</h2>
-            <div class="game-placeholder table-bg">
-                [ BLACKJACK MASASI ]
+            <button onclick="backToLobby()" class="back-btn" style="float:left; width:auto; margin:0 0 10px 0;"><i class="fa-solid fa-chevron-left"></i> Lobiye Dön</button>
+            <div style="clear:both"></div>
+
+            <div id="casino-table">
+                <div id="dealer-area">
+                    <div id="dealer-cards" class="cards-row"></div>
+                    <div class="score-label">DEALER: <span id="dealer-score">?</span></div>
+                </div>
+                <div id="bj-msg-box">Bahis yap ve oyna!</div>
+                <div id="player-area"></div>
+                <div class="ui-panel">
+                    <div id="bj-bet-ui" class="input-group">
+                        <input type="number" id="bj-bet-input" value="100" min="10">
+                        <button id="btn-bj-bet" onclick="startBlackjack()">DAĞIT</button>
+                    </div>
+                    <div id="bj-game-ui" class="btn-group" style="display:none;">
+                        <button id="btn-hit" onclick="hitBlackjack()">KART AL</button>
+                        <button id="btn-stand" onclick="standBlackjack()">DUR</button>
+                        <button id="btn-double" onclick="doubleDownBlackjack()">İKİYE KATLA</button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div id="view-roulette" class="game-view hidden">
-            <button onclick="backToLobby()" class="back-btn">⬅ Lobiye Dön</button>
-            <h2 style="color:#e74c3c; margin-top:10px;">🎡 RULET ROYALE</h2>
-            <div class="game-placeholder table-bg">
-                [ RULET ÇARKI ]
+            <button onclick="backToLobby()" class="back-btn" style="float:left; width:auto; margin:0 0 10px 0;"><i class="fa-solid fa-chevron-left"></i> Lobiye Dön</button>
+            <div style="clear:both"></div>
+            
+            <div class="roulette-main-container">
+                <div class="roulette-game-area">
+                    <h1 style="margin: 10px 0; color: #f1c40f; font-family: 'Cinzel', serif;">ELITE RULET</h1>
+                    <div class="info-panel">
+                        <p>Bakiye: <span id="balanceDisplay">0</span> TL</p>
+                        <p>Masadaki Toplam Bahis: <span id="totalBetDisplay" style="color: yellow;">0</span></p>
+                        <p id="statusMessage">Önce Birim Fiyat, sonra Çip seçip masaya tıklayın.</p>
+                    </div>
+            
+                    <div class="wheel-container">
+                        <div class="wheel-outer">
+                            <div class="wheel" id="rouletteWheel"></div>
+                        </div>
+                        <div class="arrow">▼</div>
+                        <div id="winnerOverlay" class="winner-overlay hidden">
+                            <span id="winnerText">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="betting-area">
+                    <div class="bet-controls-container">
+                        <div class="base-input-row" id="tutorial-step-1">
+                            <label>Birim:</label>
+                            <input type="number" id="baseUnitInput" min="1" value="10">
+                            <button id="clearBetsBtn" onclick="clearTableBets()" class="clear-btn">Temizle</button>
+                        </div>
+                        
+                        <div class="chip-selection-row" id="tutorial-step-2">
+                            <div class="chips-wrapper">
+                                <div class="chip-select chip-1 selected-chip" onclick="selectChip(1)">x1</div>
+                                <div class="chip-select chip-2" onclick="selectChip(2)">x2</div>
+                                <div class="chip-select chip-5" onclick="selectChip(5)">x5</div>
+                                <div class="chip-select chip-10" onclick="selectChip(10)">x10</div>
+                                <div class="chip-select chip-50" onclick="selectChip(50)">x50</div>
+                                <div class="chip-select chip-100" onclick="selectChip(100)">x100</div>
+                            </div>
+                        </div>
+                        
+                        <button id="spinButton" onclick="startRouletteGame()">ÇEVİR</button>
+                    </div>
+
+                    <div class="table-container" id="tutorial-step-3">
+                        <div class="betting-grid">
+                            <button class="bet-btn zero" onclick="placeBetOnTable(0, this)">0</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(1, this)">1</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(2, this)">2</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(3, this)">3</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(4, this)">4</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(5, this)">5</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(6, this)">6</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(7, this)">7</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(8, this)">8</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(9, this)">9</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(10, this)">10</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(11, this)">11</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(12, this)">12</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(13, this)">13</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(14, this)">14</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(15, this)">15</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(16, this)">16</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(17, this)">17</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(18, this)">18</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(19, this)">19</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(20, this)">20</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(21, this)">21</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(22, this)">22</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(23, this)">23</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(24, this)">24</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(25, this)">25</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(26, this)">26</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(27, this)">27</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(28, this)">28</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(29, this)">29</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(30, this)">30</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(31, this)">31</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(32, this)">32</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(33, this)">33</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(34, this)">34</button>
+                            <button class="bet-btn black" onclick="placeBetOnTable(35, this)">35</button>
+                            <button class="bet-btn red" onclick="placeBetOnTable(36, this)">36</button>
+                            
+                            <div class="dozen-bets-row">
+                                <button class="bet-btn dozen-btn" onclick="placeBetOnTable('1ST12', this)">1st 12</button>
+                                <button class="bet-btn dozen-btn" onclick="placeBetOnTable('2ND12', this)">2nd 12</button>
+                                <button class="bet-btn dozen-btn" onclick="placeBetOnTable('3RD12', this)">3rd 12</button>
+                            </div>
+                            
+                            <div class="outside-bets-row">
+                                <button class="bet-btn outside-btn" onclick="placeBetOnTable('EVEN', this)">EVEN</button>
+                                <button class="bet-btn red-bet-btn" onclick="placeBetOnTable('RED', this)">RED</button>
+                                <button class="bet-btn black-bet-btn" onclick="placeBetOnTable('BLACK', this)">BLACK</button>
+                                <button class="bet-btn outside-btn" onclick="placeBetOnTable('ODD', this)">ODD</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
     </div>
 
+    <div id="paytable-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn" onclick="togglePayTable()">&times;</span>
+            <h2>KAZANÇ TABLOSU</h2>
+            <p>ORTA ÇERÇEVEDE 3 TANE BUL!</p>
+            <div class="pay-row"><span>3 x 7️⃣</span> <span>= 100x Bahis</span></div>
+            <div class="pay-row"><span>3 x 💎</span> <span>= 50x Bahis</span></div>
+            <div class="pay-row"><span>3 x 🔔</span> <span>= 20x Bahis</span></div>
+            <div class="pay-row"><span>3 x 🍒</span> <span>= 10x Bahis</span></div>
+            <div class="pay-row"><span>3 x 🍋</span> <span>= 5x Bahis</span></div>
+        </div>
+    </div>
+
+    <div id="celebration-overlay" class="hidden-overlay">
+        <div id="big-win-text">
+            KAZANDIN!<br>
+            <span id="big-win-amount">0</span>
+        </div>
+        <div id="confetti-container"></div>
+    </div>
+
+    <audio id="spinSound" src="spin.wav"></audio>
+    <audio id="reelStopSound" src="stop.mp3"></audio>
+    <audio id="winSound" src="win.wav"></audio>
+    <audio id="loseSound" src="lose.mp3"></audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
