@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casino Online</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="intro-screen">
+        <div class="glow-circle">
+            <h1 class="brand-name">casino</h1>
+        </div>
+    </div>
+
+    <div id="start-screen" class="container wide-container hidden">
+        <h1 class="casino-title" style="font-size: 36px; margin-bottom: 10px;">OYUN DÜNYASI</h1>
+        <p style="color:#bdc3c7; margin-bottom: 30px;">Kazanmaya başlamak için favori oyununu seç.</p>
+        
+        <div class="games-grid">
+            <div class="game-card slot-card">
+                <div class="icon">🎰</div>
+                <h3>SLOT MACHINE</h3>
+            </div>
+            <div class="game-card blackjack-card">
+                <div class="icon">♠️</div>
+                <h3>BLACKJACK</h3>
+            </div>
+            <div class="game-card roulette-card">
+                <div class="icon">🎡</div>
+                <h3>RULET</h3>
+            </div>
+        </div>
+        
+        <button onclick="goToLoginScreen()" class="big-start-btn">GİRİŞ YAP VE OYNA</button>
+    </div>
+
+    <div id="login-container" class="container hidden">
+        <h1 class="casino-title">GİRİŞ YAP</h1>
+        <div class="form-group">
+            <input type="text" id="login-username" placeholder="Kullanıcı Adı">
+        </div>
+        <div class="form-group">
+            <input type="password" id="login-password" placeholder="Şifre">
+        </div>
+        <button onclick="login()">GİRİŞ YAP</button>
+        <p class="toggle-text">Hesabın yok mu? <span onclick="showRegister()">Hemen Kayıt Ol</span></p>
+        <button onclick="goBackToStart()" style="background-color: #7f8c8d; margin-top: 5px;">Geri Dön</button>
+        <p id="login-error" class="error"></p>
+    </div>
+
+    <div id="register-container" class="container hidden">
+        <h1 class="casino-title">KAYIT OL</h1>
+        <input type="text" id="reg-username" placeholder="Kullanıcı Adı">
+        <input type="email" id="reg-email" placeholder="E-posta">
+        <input type="text" id="reg-credit" placeholder="Kredi Kartı No">
+        <input type="password" id="reg-password" placeholder="Şifre">
+        <button onclick="registerUser()">HESAP OLUŞTUR</button>
+        <p class="toggle-text">Zaten hesabın var mı? <span onclick="showLogin()">Giriş Yap</span></p>
+        <button onclick="goBackToStart()" style="background-color: #7f8c8d; margin-top: 5px;">Geri Dön</button>
+        <p id="reg-error" class="error"></p>
+        <p id="reg-success" class="success"></p>
+    </div>
+
+    <div id="game-screen" class="container wide-container hidden">
+        
+        <div class="header">
+            <div style="float:left; font-size:18px;">👤 <span id="welcome-msg">Misafir</span></div>
+            <div class="balance-box">💰 <span id="balance">0</span> TL</div>
+            <div style="clear:both;"></div>
+        </div>
+
+        <div id="lobby-view">
+            <p style="text-align:left; color:#bdc3c7; margin-bottom:20px; font-size:14px;">Oyun seçmek için kutucuğa tıklayınız:</p>
+            
+            <div class="lobby-grid">
+                
+                <div class="lobby-card card-slot" onclick="openGame('slot')">
+                    <div class="card-icon">🎰</div>
+                    <h3>SLOT</h3>
+                    <div class="play-btn-small">OYNA</div>
+                </div>
+
+                <div class="lobby-card card-bj" onclick="openGame('bj')">
+                    <div class="card-icon">♠️</div>
+                    <h3>BLACKJACK</h3>
+                    <div class="play-btn-small">OYNA</div>
+                </div>
+
+                <div class="lobby-card card-roulette" onclick="openGame('roulette')">
+                    <div class="card-icon">🎡</div>
+                    <h3>RULET</h3>
+                    <div class="play-btn-small">OYNA</div>
+                </div>
+
+            </div>
+            
+            <button onclick="location.reload()" class="logout-btn" style="margin-top:40px;">Çıkış Yap</button>
+        </div>
+
+        <div id="view-slot" class="game-view hidden">
+            <button onclick="backToLobby()" class="back-btn">⬅ Lobiye Dön</button>
+            <h2 style="color:#f1c40f; margin-top:10px;">🎰 SUPER SLOT</h2>
+            <div class="game-placeholder slot-bg">
+                [ SLOT MAKİNESİ DÖNÜYOR... ]
+            </div>
+        </div>
+
+        <div id="view-bj" class="game-view hidden">
+            <button onclick="backToLobby()" class="back-btn">⬅ Lobiye Dön</button>
+            <h2 style="color:#2ecc71; margin-top:10px;">♠️ BLACKJACK 21</h2>
+            <div class="game-placeholder table-bg">
+                [ BLACKJACK MASASI ]
+            </div>
+        </div>
+
+        <div id="view-roulette" class="game-view hidden">
+            <button onclick="backToLobby()" class="back-btn">⬅ Lobiye Dön</button>
+            <h2 style="color:#e74c3c; margin-top:10px;">🎡 RULET ROYALE</h2>
+            <div class="game-placeholder table-bg">
+                [ RULET ÇARKI ]
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
