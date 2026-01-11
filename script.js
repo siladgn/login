@@ -11,6 +11,7 @@ function saveData() {
 }
 
 window.addEventListener('load', function() {
+    // Animasyon süresi 3.5 saniye yapıldı (yeni intro için)
     setTimeout(() => {
         const intro = document.getElementById("intro-screen");
         const startScreen = document.getElementById("start-screen");
@@ -19,7 +20,7 @@ window.addEventListener('load', function() {
             if (intro) intro.style.display = "none";
             if (startScreen) startScreen.classList.remove("hidden");
         }, 1000); 
-    }, 2000);
+    }, 3500);
 
     generatePool(); 
     setupEnterKeySupport();
@@ -287,10 +288,29 @@ function showWinCelebration(multiplier) {
 
 
 /* =========================================
-   --- BLACKJACK OYUN MOTORU --- 
+   --- BLACKJACK OYUN MOTORU (GELİŞMİŞ) --- 
    ========================================= */
 const Suits = ["♥", "♦", "♣", "♠"];
 const Ranks = { "A": 11, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "J": 10, "Q": 10, "K": 10 };
+
+// Ses Efektleri (Dosyalar varsa çalacak, yoksa hata vermez)
+const bjSounds = {
+    deal: new Audio('sounds/deal.mp3'),
+    win: new Audio('sounds/win.wav'),
+    lose: new Audio('sounds/lose.wav'),
+    blackjack: new Audio('sounds/blackjack.wav'),
+    push: new Audio('sounds/push.wav')
+};
+
+function playSoundBJ(name) {
+    try {
+        if (bjSounds[name]) {
+            bjSounds[name].currentTime = 0;
+            bjSounds[name].volume = 0.5;
+            bjSounds[name].play().catch(() => {}); // Ses dosyası yoksa hatayı yut
+        }
+    } catch(e) {}
+}
 
 class Deck {
     constructor() {
@@ -315,32 +335,63 @@ class Hand {
 let bjDeck, playerHands, dealerHand, curIdx, isPlaying = false, bjCurrentBet = 0, isProcessing = false;
 const wait = (ms) => new Promise(res => setTimeout(res, ms));
 
-function drawCard(card, hide = false) {
-    if (hide) return `<div class="card" style="background:#2c3e50; border:2px solid #fff"></div>`;
+function drawCard(card, hide = false, anime = false) {
+    if (hide) return `<div class="card ${anime?'card-anim':''}" style="background: linear-gradient(135deg, #2c3e50, #000); border: 2px solid #fff;"></div>`;
     const red = (card.suit==="♥" || card.suit==="♦") ? "red" : "";
-    return `<div class="card ${red} card-anim"><div>${card.rank}</div><div>${card.suit}</div></div>`;
+    return `<div class="card ${red} ${anime?'card-anim':''}">
+              <div style="align-self: flex-start; margin-left:5px;">${card.rank}</div>
+              <div style="font-size:30px;">${card.suit}</div>
+              <div style="align-self: flex-end; margin-right:5px; transform: rotate(180deg);">${card.rank}</div>
+            </div>`;
 }
 
-function updateBJUI(final = false) {
-    document.getElementById('dealer-cards').innerHTML = dealerHand.cards.map((c, i) => drawCard(c, i === 1 && !final)).join('');
+function updateBJUI(final = false, isNewPlayerCard = false, isNewDealerCard = false) {
+    // Dealer Kartları
+    document.getElementById('dealer-cards').innerHTML = dealerHand.cards.map((c, i) => 
+        drawCard(c, i === 1 && !final, isNewDealerCard && i === dealerHand.cards.length - 1)).join('');
     document.getElementById('dealer-score').innerText = final ? dealerHand.score() : "?";
 
+    // Oyuncu Elleri
     document.getElementById('player-area').innerHTML = playerHands.map((h, i) => {
-        let labelClass = h.result.includes("WIN") || h.result.includes("BLACKJACK") ? "win-label" : 
-                         h.result.includes("LOSE") || h.result.includes("BUST") ? "lose-label" : 
-                         h.result.includes("PUSH") ? "push-label" : "";
+        let labelClass = h.result.includes("KAZANDIN") || h.result.includes("BLACKJACK") ? "win-label" : 
+                         h.result.includes("KAYBETTİN") || h.result.includes("PATLADI") ? "lose-label" : 
+                         h.result.includes("BERABERE") ? "push-label" : "";
         const resultHTML = h.result ? `<div class="result-label ${labelClass}">${h.result}</div>` : "";
         const activeClass = (i === curIdx && isPlaying && !final) ? "active-hand" : "";
 
+        // Son kart animasyonu için kontrol
+        const cardsHTML = h.cards.map((c, idx) => 
+            drawCard(c, false, i === curIdx && idx === h.cards.length-1 && isNewPlayerCard)
+        ).join('');
+
         return `<div class="hand-container ${activeClass}">
             ${resultHTML}
-            <div class="cards-row">${h.cards.map(c => drawCard(c)).join('')}</div>
+            <div style="font-size:12px; font-weight:bold; color:#ccc; margin-bottom:5px;">EL ${i+1}</div>
+            <div class="cards-row">${cardsHTML}</div>
             <div class="score" style="color:white; font-weight:bold; margin-top:5px;">SKOR: ${h.score()}</div>
         </div>`;
     }).join('');
 
+    // Buton Kontrolleri
     document.getElementById('bj-bet-ui').style.display = isPlaying ? 'none' : 'flex';
     document.getElementById('bj-game-ui').style.display = isPlaying ? 'flex' : 'none';
+    
+    // İşlem sırasındaysa butonları kilitle
+    const btns = document.querySelectorAll('#bj-game-ui button');
+    btns.forEach(b => b.disabled = isProcessing);
+
+    // Split ve Double Butonlarını Göster/Gizle
+    if(isPlaying && !final && !isProcessing) {
+        const h = playerHands[curIdx];
+        const canSplit = (h.cards.length === 2 && h.cards[0].val === h.cards[1].val && currentUser.balance >= bjCurrentBet);
+        const canDouble = (h.cards.length === 2 && currentUser.balance >= bjCurrentBet);
+
+        const btnSplit = document.getElementById('btn-split');
+        if(btnSplit) btnSplit.style.display = canSplit ? 'block' : 'none';
+
+        const btnDouble = document.getElementById('btn-double');
+        if(btnDouble) btnDouble.style.display = canDouble ? 'block' : 'none';
+    }
     
     updateGlobalBalance();
 }
@@ -349,10 +400,10 @@ async function startBlackjack() {
     if (isProcessing) return;
     let betValue = parseInt(document.getElementById('bj-bet-input').value);
     
-    if(isNaN(betValue) || betValue <= 0) { alert("Geçersiz Bahis!"); return; }
+    if(isNaN(betValue) || betValue <= 0) { alert("Geçersiz Tutar!"); return; }
     if(currentUser.balance < betValue) { alert("YETERSİZ BAKİYE!"); return; }
 
-    isProcessing = true;
+    isProcessing = true; // Kilitle
     currentUser.balance -= betValue;
     bjCurrentBet = betValue;
     isPlaying = true;
@@ -361,12 +412,13 @@ async function startBlackjack() {
     document.getElementById('bj-msg-box').innerText = "Kartlar Dağıtılıyor...";
     updateBJUI();
 
-    playerHands[0].add(bjDeck.deal()); updateBJUI(); await wait(400);
-    dealerHand.add(bjDeck.deal()); updateBJUI(); await wait(400);
-    playerHands[0].add(bjDeck.deal()); updateBJUI(); await wait(400);
-    dealerHand.add(bjDeck.deal()); updateBJUI(); await wait(400);
+    // Dağıtma Animasyonu
+    playerHands[0].add(bjDeck.deal()); playSoundBJ('deal'); updateBJUI(false, true); await wait(450);
+    dealerHand.add(bjDeck.deal()); playSoundBJ('deal'); updateBJUI(false, false, true); await wait(450);
+    playerHands[0].add(bjDeck.deal()); playSoundBJ('deal'); updateBJUI(false, true); await wait(450);
+    dealerHand.add(bjDeck.deal()); playSoundBJ('deal'); updateBJUI(false, false, true); await wait(450);
 
-    isProcessing = false;
+    isProcessing = false; // Kilidi Aç
     document.getElementById('bj-msg-box').innerText = "Hamlenizi yapın!";
     updateBJUI();
     
@@ -376,74 +428,118 @@ async function startBlackjack() {
 async function hitBlackjack() {
     if (isProcessing || !isPlaying) return;
     isProcessing = true;
+    
     playerHands[curIdx].add(bjDeck.deal());
-    updateBJUI();
+    playSoundBJ('deal');
+    updateBJUI(false, true);
     await wait(500);
-    if (playerHands[curIdx].score() >= 21) await standBlackjack();
-    else isProcessing = false;
+
+    if (playerHands[curIdx].score() >= 21) {
+        await standBlackjack();
+    } else {
+        isProcessing = false;
+        updateBJUI();
+    }
 }
 
 async function standBlackjack() {
     if (!isPlaying) return;
     isProcessing = true;
+    
     if (curIdx < playerHands.length - 1) { 
-        curIdx++; isProcessing = false; updateBJUI();
+        curIdx++; 
+        isProcessing = false; 
+        updateBJUI();
     } else {
         await dealerTurn();
     }
 }
 
 async function doubleDownBlackjack() {
-    if (isProcessing || currentUser.balance < bjCurrentBet) {
-        if(currentUser.balance < bjCurrentBet) alert("Yetersiz Bakiye!");
-        return;
-    }
+    if (isProcessing) return;
+    if(currentUser.balance < bjCurrentBet) { alert("Bakiyeniz yetersiz!"); return; }
+
     isProcessing = true;
     currentUser.balance -= bjCurrentBet; 
     bjCurrentBet *= 2;
+    
     playerHands[curIdx].add(bjDeck.deal());
-    updateBJUI();
+    playSoundBJ('deal');
+    updateBJUI(false, true);
     await wait(500);
+    
     await standBlackjack();
+}
+
+async function splitHandBlackjack() {
+    if (isProcessing) return;
+    if(currentUser.balance < bjCurrentBet) { alert("Bakiyeniz yetersiz!"); return; }
+
+    isProcessing = true;
+    currentUser.balance -= bjCurrentBet;
+    
+    // Eli Böl
+    let currentHand = playerHands[curIdx];
+    let splitCard = currentHand.cards.pop(); // İkinci kartı al
+    
+    let newHand = new Hand();
+    newHand.add(splitCard); // Yeni ele koy
+    
+    playerHands.push(newHand); // Yeni eli diziye ekle
+    
+    // Her iki ele de birer kart dağıt
+    currentHand.add(bjDeck.deal()); playSoundBJ('deal'); updateBJUI(); await wait(400);
+    newHand.add(bjDeck.deal()); playSoundBJ('deal'); updateBJUI(); await wait(400);
+    
+    isProcessing = false;
+    updateBJUI();
 }
 
 async function dealerTurn() {
     isPlaying = false;
     updateBJUI(true); await wait(800);
-    while(dealerHand.score() < 17) {
-        dealerHand.add(bjDeck.deal());
-        updateBJUI(true); await wait(800);
+    
+    // Eğer tüm oyuncu elleri patladıysa (BUST) dealer oynamaz
+    const allBust = playerHands.every(h => h.score() > 21);
+    
+    if (!allBust) {
+        while(dealerHand.score() < 17) {
+            dealerHand.add(bjDeck.deal());
+            playSoundBJ('deal');
+            updateBJUI(true, false, true); await wait(800);
+        }
     }
     finishBlackjack();
 }
 
 function finishBlackjack() {
     let d = dealerHand.score();
-    let winSound = document.getElementById("winSound");
-    let loseSound = document.getElementById("loseSound");
+    let soundToPlay = "lose";
 
     playerHands.forEach((h) => {
         let p = h.score();
         let winAmount = 0;
 
-        if(p > 21) { h.result = "KAYBETTİN"; }
+        if(p > 21) { 
+            h.result = "PATLADI (BUST)"; 
+        }
         else if(h.cards.length === 2 && p === 21) { 
             h.result = "BLACKJACK!"; 
             winAmount = bjCurrentBet * 2.5; 
-            try{ if(winSound) winSound.play(); } catch(e){}
+            soundToPlay = "blackjack";
         }
         else if(d > 21 || p > d) { 
             h.result = "KAZANDIN!"; 
             winAmount = bjCurrentBet * 2; 
-            try{ if(winSound) winSound.play(); } catch(e){}
+            if(soundToPlay !== "blackjack") soundToPlay = "win";
         }
         else if(d > p) { 
             h.result = "KAYBETTİN"; 
-            try{ if(loseSound) loseSound.play(); } catch(e){}
         }
         else { 
             h.result = "BERABERE"; 
             winAmount = bjCurrentBet; 
+            if(soundToPlay === "lose") soundToPlay = "push";
         }
 
         if(winAmount > 0) {
@@ -452,6 +548,7 @@ function finishBlackjack() {
     });
 
     document.getElementById('bj-msg-box').innerText = "Tur Bitti!";
+    playSoundBJ(soundToPlay);
     updateBJUI(true);
     isProcessing = false;
 }

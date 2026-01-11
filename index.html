@@ -12,16 +12,24 @@
 <body>
 
     <div id="intro-screen">
-        <div class="glow-circle">
-            <h1 class="brand-name">ROYALE</h1>
+        <div class="intro-content">
+            <h2 class="intro-sub">WELCOME TO</h2>
+            <div class="intro-brand">
+                <span class="neon-text">CASINO</span>
+                <span class="gold-text">ROYALE</span>
+            </div>
+            <div class="loading-bar">
+                <div class="bar-fill"></div>
+            </div>
         </div>
     </div>
 
     <div id="start-screen" class="container wide-container hidden">
         <h1 class="casino-title">CASINO ROYALE</h1>
-        <p style="color:#bdc3c7; margin-bottom: 50px; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; opacity: 0.7;">
-            Sınırsız Eğlence • Gerçek Kazanç
+        <p style="color:#bdc3c7; margin-bottom: 40px; font-size: 12px; letter-spacing: 5px; text-transform: uppercase; opacity: 0.8; font-weight: 600;">
+            Premium Online Casino Deneyimi
         </p>
+        
         <div class="games-grid">
             <div class="game-card slot-card">
                 <div class="icon"><i class="fa-solid fa-dice"></i></div>
@@ -36,6 +44,7 @@
                 <h3>ELITE RULET</h3>
             </div>
         </div>
+
         <button onclick="goToLoginScreen()" class="pulse-btn">GİRİŞ YAP VE KAZAN</button>
     </div>
 
@@ -166,7 +175,9 @@
         </div>
 
         <div id="view-bj" class="game-view hidden">
-            <button onclick="backToLobby()" class="back-btn" style="float:left; width:auto; margin:0 0 10px 0;"><i class="fa-solid fa-chevron-left"></i> Lobiye Dön</button>
+            <button onclick="backToLobby()" class="back-btn" style="float:left; width:auto; margin:0 0 10px 0;">
+                <i class="fa-solid fa-chevron-left"></i> Lobiye Dön
+            </button>
             <div style="clear:both"></div>
 
             <div id="casino-table">
@@ -174,17 +185,22 @@
                     <div id="dealer-cards" class="cards-row"></div>
                     <div class="score-label">DEALER: <span id="dealer-score">?</span></div>
                 </div>
+
                 <div id="bj-msg-box">Bahis yap ve oyna!</div>
+
                 <div id="player-area"></div>
+
                 <div class="ui-panel">
                     <div id="bj-bet-ui" class="input-group">
                         <input type="number" id="bj-bet-input" value="100" min="10">
-                        <button id="btn-bj-bet" onclick="startBlackjack()">DAĞIT</button>
+                        <button id="btn-bj-bet" onclick="startBlackjack()">BAHİS YAP & DAĞIT</button>
                     </div>
+
                     <div id="bj-game-ui" class="btn-group" style="display:none;">
                         <button id="btn-hit" onclick="hitBlackjack()">KART AL</button>
                         <button id="btn-stand" onclick="standBlackjack()">DUR</button>
                         <button id="btn-double" onclick="doubleDownBlackjack()">İKİYE KATLA</button>
+                        <button id="btn-split" onclick="splitHandBlackjack()" style="background: #9b59b6; display:none;">BÖL (SPLIT)</button>
                     </div>
                 </div>
             </div>

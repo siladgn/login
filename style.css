@@ -20,12 +20,12 @@ body {
 
 /* --- 2. CONTAINER --- */
 .container {
-    background: rgba(0, 0, 0, 0.45); 
-    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+    background: rgba(0, 0, 0, 0.6); 
+    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     padding: 30px 40px; 
     border-radius: 30px;
-    box-shadow: 0 30px 80px rgba(0,0,0, 0.7);
+    box-shadow: 0 30px 80px rgba(0,0,0, 0.8);
     max-height: 95vh; 
     overflow-y: auto; 
     width: 400px; text-align: center; transition: all 0.4s ease;
@@ -58,31 +58,66 @@ body {
 }
 .header-logout-btn:hover { background: #e74c3c; color: white; transform: rotate(90deg); }
 
+/* Giriş Ekranı Başlığı */
 .casino-title {
-    font-size: 46px; font-weight: 900; margin-bottom: 10px; margin-top: 0; letter-spacing: 3px;
+    font-size: 50px; font-weight: 900; margin-bottom: 10px; margin-top: 0; letter-spacing: 3px;
     background: linear-gradient(to bottom, #ebd197, #b48811, #ebd197, #fff); 
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     color: #f1c40f; filter: drop-shadow(0 0 15px rgba(241, 196, 15, 0.3));
+    text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* --- YENİ EKLENEN GRID SİSTEMİ (YAN YANA DİZME İÇİN) --- */
+.games-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin: 40px 0;
+    flex-wrap: wrap;
+    width: 100%;
 }
 
 .lobby-grid { display: flex; justify-content: space-between; gap: 20px; flex-wrap: nowrap; width: 100%; }
 
+/* --- KART TASARIMLARI (PREMIUM GÖRÜNÜM) --- */
 .game-card, .lobby-card {
-    background: rgba(255, 255, 255, 0.03); 
-    border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 25px;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.4));
+    border: 1px solid rgba(255, 255, 255, 0.05); 
+    border-radius: 25px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
-.game-card { width: 200px; padding: 30px 20px; }
+
+.game-card { 
+    width: 220px; height: 280px; padding: 20px; 
+    border: 1px solid rgba(255, 215, 0, 0.1); /* Hafif altın çerçeve */
+}
 .lobby-card { width: 32%; height: 240px; padding: 15px; box-sizing: border-box; }
 
-.game-card .icon, .lobby-card .card-icon { font-size: 50px; margin-bottom: 20px; color: rgba(255,255,255,0.8); }
-.game-card h3, .lobby-card h3 { font-size: 16px; margin: 0; color: white; font-weight: 700; }
+.game-card .icon, .lobby-card .card-icon { 
+    font-size: 60px; margin-bottom: 25px; 
+    background: linear-gradient(to bottom, #ffd700, #b8860b);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.2));
+    transition: 0.4s;
+}
+.game-card h3, .lobby-card h3 { 
+    font-family: 'Cinzel', serif; font-size: 16px; margin: 0; color: #e0e0e0; font-weight: 700; letter-spacing: 1px;
+}
 
-.game-card:hover, .lobby-card:hover { transform: translateY(-8px); background: rgba(255, 255, 255, 0.07); }
-.slot-card:hover .icon, .lobby-card.card-slot:hover .card-icon { color: #f1c40f; filter: drop-shadow(0 0 20px #f1c40f); }
-.blackjack-card:hover .icon, .lobby-card.card-bj:hover .card-icon { color: #3498db; filter: drop-shadow(0 0 20px #3498db); }
-.roulette-card:hover .icon, .lobby-card.card-roulette:hover .card-icon { color: #e74c3c; filter: drop-shadow(0 0 20px #e74c3c); }
+/* Hover Efektleri */
+.game-card:hover, .lobby-card:hover { 
+    transform: translateY(-10px) scale(1.02); 
+    background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(0,0,0,0.6));
+    border-color: #f1c40f;
+    box-shadow: 0 20px 50px rgba(241, 196, 15, 0.15);
+}
+.game-card:hover .icon, .lobby-card:hover .card-icon { 
+    transform: scale(1.1) rotate(5deg);
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+}
 
 .play-btn-small {
     margin-top: 20px; padding: 10px 30px; border-radius: 50px; font-size: 11px; font-weight: bold;
@@ -91,14 +126,17 @@ body {
 .lobby-card:hover .play-btn-small { background: white; color: black; }
 
 .pulse-btn {
-    background: linear-gradient(90deg, #ff8c00, #ff0080); color: white; border: none; padding: 18px; border-radius: 50px; 
-    font-size: 16px; width: 100%; margin-top: 30px; font-weight: 800; cursor: pointer; transition: all 0.4s;
+    background: linear-gradient(90deg, #d35400, #c0392b); color: white; border: none; padding: 18px 40px; border-radius: 50px; 
+    font-size: 16px; width: auto; min-width: 250px; margin-top: 30px; font-weight: 800; cursor: pointer; transition: all 0.4s;
+    font-family: 'Cinzel', serif; letter-spacing: 1px;
+    border: 1px solid rgba(231, 76, 60, 0.5);
+    box-shadow: 0 0 20px rgba(231, 76, 60, 0.3);
 }
-.pulse-btn:hover { transform: scale(1.02); box-shadow: 0 10px 30px rgba(255, 0, 128, 0.5); }
+.pulse-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(231, 76, 60, 0.6); background: linear-gradient(90deg, #e67e22, #e74c3c); }
 
 input {
     width: 100%; padding: 16px; margin: 10px 0; border-radius: 18px; 
-    border: 1px solid rgba(255,255,255,0.1); background: rgba(0, 0, 0, 0.3); color: white;
+    border: 1px solid rgba(255,255,255,0.1); background: rgba(0, 0, 0, 0.3); color: white; box-sizing: border-box;
 }
 input:focus { outline: none; border-color: #ff0080; background: rgba(0, 0, 0, 0.6); }
 
@@ -156,59 +194,119 @@ input:focus { outline: none; border-color: #ff0080; background: rgba(0, 0, 0, 0.
     background: linear-gradient(to bottom, #ff3333, #b30000); border: none; color: white;
     font-size: 20px; font-weight: bold; padding: 12px 30px; border-radius: 15px; border: 2px solid #ff6666;
     cursor: pointer; box-shadow: 0 6px 0 #800000; transition: filter 0.2s;
+    min-width: 120px; /* Spin butonu genişliği */
 }
 #spin-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #800000; }
 #spin-btn:disabled { filter: grayscale(100%); cursor: not-allowed; }
 
-/* --- BLACKJACK STİLLERİ --- */
+/* --- BLACKJACK STİLLERİ (YENİ ENTEGRASYON) --- */
 #casino-table {
-    width: 100%; min-height: 500px;
+    width: 100%;
+    max-width: 1000px;
+    min-height: 600px; /* Masayı biraz uzattık */
+    margin: 0 auto;
     background: radial-gradient(circle, #1a472a 0%, #0b2b18 100%);
-    border: 8px solid #3e2723; border-radius: 50px;
-    position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-    box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
-    padding: 20px; box-sizing: border-box;
+    border: 12px solid #3e2723; /* Kalın kahverengi çerçeve */
+    border-radius: 150px; /* Orijinal koddaki yuvarlak hatlar */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+    padding: 60px 20px 40px 20px;
+    box-sizing: border-box;
 }
-#dealer-area { margin-bottom: 20px; }
-.score-label { background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px; margin-top: 5px; font-size: 14px; }
-#bj-msg-box { font-size: 18px; font-weight: bold; color: #f1c40f; min-height: 25px; margin: 10px 0; }
-#player-area { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; width: 100%; margin-bottom: 20px; }
 
+#dealer-area { margin-bottom: 20px; text-align: center; }
+.score-label { 
+    background: rgba(0,0,0,0.6); color: #f1c40f; 
+    padding: 5px 15px; border-radius: 50px; margin-top: 10px; 
+    font-size: 14px; display: inline-block; border: 1px solid #f1c40f;
+}
+
+#bj-msg-box { 
+    font-size: 22px; font-weight: bold; color: #f1c40f; 
+    min-height: 30px; margin: 10px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    letter-spacing: 1px;
+}
+
+#player-area { 
+    display: flex; flex-wrap: wrap; justify-content: center; 
+    gap: 30px; width: 100%; margin-bottom: 20px; 
+}
+
+/* El Konteyneri */
 .hand-container {
-    background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 2px solid transparent; min-width: 120px; position: relative;
+    padding: 20px 15px;
+    border-radius: 15px;
+    border: 2px solid transparent;
+    transition: 0.3s;
+    background: rgba(0,0,0,0.2);
+    position: relative;
+    min-width: 180px;
+    text-align: center;
 }
-.active-hand { border-color: #f1c40f; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4); }
+.active-hand { 
+    border-color: #f1c40f; 
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.4); 
+    background: rgba(241, 196, 15, 0.05);
+    transform: translateY(-5px);
+}
 
-.cards-row { display: flex; justify-content: center; gap: -30px; min-height: 80px; margin: 10px 0; }
+/* Kart Stilleri */
+.cards-row { display: flex; justify-content: center; gap: -40px; min-height: 120px; margin: 10px 0; }
 .card {
-    width: 60px; height: 90px; background: white; color: black; border-radius: 5px;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    font-weight: bold; font-size: 18px; box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-    margin-left: -20px; border: 1px solid #ccc;
+    width: 80px; height: 115px; 
+    background: white; color: black; border-radius: 8px;
+    display: flex; flex-direction: column; justify-content: space-around; 
+    align-items: center;
+    font-weight: bold; font-size: 22px; 
+    box-shadow: 3px 3px 8px rgba(0,0,0,0.5);
+    margin-left: -30px; /* Kartların üst üste binmesi */
+    border: 1px solid #ccc;
+    transition: transform 0.3s;
 }
 .card:first-child { margin-left: 0; }
 .card.red { color: #d32f2f; }
-.card-anim { animation: dealCard 0.3s ease-out; }
-@keyframes dealCard { from { transform: translateY(-50px) scale(0.5); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+.card-anim { animation: cardDrop 0.4s ease-out; }
 
+@keyframes cardDrop { 
+    0% { opacity: 0; transform: translateY(-100px) rotate(-10deg); } 
+    100% { opacity: 1; transform: translateY(0) rotate(0deg); } 
+}
+
+/* Sonuç Etiketleri */
 .result-label {
-    position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-    padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; width: 80%; text-transform: uppercase;
+    position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+    padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; 
+    width: auto; min-width: 80px; text-transform: uppercase; z-index: 10;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
-.win-label { background: #2ecc71; color: white; }
-.lose-label { background: #e74c3c; color: white; }
-.push-label { background: #3498db; color: white; }
+.win-label { background: #2ecc71; color: white; border: 1px solid #27ae60; }
+.lose-label { background: #e74c3c; color: white; border: 1px solid #c0392b; }
+.push-label { background: #3498db; color: white; border: 1px solid #2980b9; }
 
-.ui-panel { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+/* Buton Grubu */
+.ui-panel { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 10px;}
 .input-group, .btn-group { display: flex; gap: 10px; align-items: center; }
-#bj-bet-input { width: 80px; padding: 10px; margin: 0; }
-#btn-bj-bet, #btn-hit, #btn-stand, #btn-double {
-    padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white;
+#bj-bet-input { 
+    width: 90px; padding: 12px; border-radius: 8px; border: none; 
+    font-size: 18px; text-align: center; background: rgba(255,255,255,0.9); color:#333;
 }
-#btn-bj-bet { background: #f1c40f; color: black; }
+#btn-bj-bet, #btn-hit, #btn-stand, #btn-double, #btn-split {
+    padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; 
+    cursor: pointer; color: white; font-size: 14px; text-transform: uppercase;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3); transition: transform 0.1s;
+}
+#btn-bj-bet { background: #f1c40f; color: #3e2723; }
 #btn-hit { background: #2ecc71; }
-#btn-stand { background: #e74c3c; }
+#btn-stand { background: #e67e22; }
 #btn-double { background: #3498db; }
+#btn-split { background: #9b59b6; }
+
+#btn-bj-bet:active, #btn-hit:active, #btn-stand:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
+button:disabled { filter: grayscale(100%); cursor: not-allowed; opacity: 0.7; }
 
 /* --- RULET STİLLERİ --- */
 .roulette-main-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; }
@@ -296,17 +394,90 @@ input:focus { outline: none; border-color: #ff0080; background: rgba(0, 0, 0, 0.
 /* DİĞERLERİ */
 .back-btn { background: transparent; color: #aaa; border: none; padding: 10px 0; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.3s; }
 .back-btn:hover { color: white; }
-#intro-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #050505; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.8s ease; }
-.glow-circle { width: 140px; height: 140px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: center; align-items: center; animation: pulseIntro 2s infinite; }
-.brand-name { color: white; font-size: 24px; font-weight: 900; letter-spacing: 3px; margin: 0; }
-@keyframes pulseIntro { 50% { border-color: rgba(255, 140, 0, 0.8); box-shadow: 0 0 50px rgba(255, 140, 0, 0.5); } }
 .error { color: #ff4757; font-size: 14px; margin-top: 15px; font-weight: bold; }
 .success { color: #2ecc71; font-size: 14px; margin-top: 15px; font-weight: bold; }
 .toggle-text { font-size: 14px; margin-top: 25px; color: #aaa; }
 .toggle-text span { color: white; cursor: pointer; font-weight: bold; }
+
+/* --- YENİ SİNEMATİK INTRO EFEKTİ --- */
+#intro-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at center, #1a1a1a, #000);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999; transition: opacity 0.8s ease-out;
+}
+
+.intro-content { text-align: center; position: relative; }
+
+/* "WELCOME TO" Yazısı */
+.intro-sub {
+    color: #666; font-size: 14px; letter-spacing: 8px; margin-bottom: 10px;
+    opacity: 0; animation: fadeInSub 1s ease-out forwards 0.5s;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Ana Marka Kutusu */
+.intro-brand {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    margin-bottom: 30px;
+}
+
+/* "CASINO" - Neon Efekti */
+.neon-text {
+    font-family: 'Poppins', sans-serif; font-weight: 300; font-size: 35px;
+    letter-spacing: 15px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    opacity: 0; transform: translateY(20px);
+    animation: revealUp 1s cubic-bezier(0.165, 0.84, 0.44, 1) forwards 0.8s;
+}
+
+/* "ROYALE" - Altın ve Sinematik Efekt */
+.gold-text {
+    font-family: 'Cinzel', serif; font-weight: 900; font-size: 70px;
+    letter-spacing: 5px;
+    background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    opacity: 0; transform: scale(1.2);
+    filter: drop-shadow(0 0 15px rgba(218, 165, 32, 0.4));
+    animation: cinemaZoom 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards 1.2s;
+    position: relative;
+}
+
+/* Yükleme Çubuğu */
+.loading-bar {
+    width: 200px; height: 2px; background: #333; margin: 0 auto;
+    border-radius: 2px; overflow: hidden; opacity: 0;
+    animation: fadeInSub 0.5s ease forwards 1.5s;
+}
+
+.bar-fill {
+    width: 0%; height: 100%; background: #ffd700;
+    box-shadow: 0 0 10px #ffd700;
+    animation: loadProgress 2s ease-in-out forwards 1.5s;
+}
+
+/* Animasyon Keyframes */
+@keyframes fadeInSub { to { opacity: 1; } }
+
+@keyframes revealUp {
+    to { opacity: 1; transform: translateY(0); letter-spacing: 18px; }
+}
+
+@keyframes cinemaZoom {
+    to { opacity: 1; transform: scale(1); letter-spacing: 10px; }
+}
+
+@keyframes loadProgress {
+    0% { width: 0%; } 50% { width: 40%; } 100% { width: 100%; }
+}
+
+/* Responsive Ayar */
 @media (max-width: 768px) {
     .wide-container { width: 95%; padding: 20px 15px; height: auto; max-height: none; overflow-y: visible;}
     .lobby-grid { flex-direction: column; }
     .lobby-card { width: 100%; height: 110px; flex-direction: row; gap: 20px; justify-content: flex-start; padding: 0 25px;}
     .game-container { transform: scale(0.9); transform-origin: top center;}
+    .neon-text { font-size: 20px; letter-spacing: 5px; }
+    .gold-text { font-size: 40px; }
+    .intro-sub { font-size: 10px; letter-spacing: 4px; }
 }
