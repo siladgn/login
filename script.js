@@ -11,7 +11,6 @@ function saveData() {
 }
 
 window.addEventListener('load', function() {
-    // Animasyon süresi 3.5 saniye
     setTimeout(() => {
         const intro = document.getElementById("intro-screen");
         const startScreen = document.getElementById("start-screen");
@@ -37,6 +36,78 @@ function setupEnterKeySupport() {
     regInputs.forEach(id => {
         const el = document.getElementById(id);
         if(el) el.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); registerUser(); } });
+    });
+}
+
+// --- GEÇMİŞ YÖNETİMİ ---
+function toggleHistory() {
+    const modal = document.getElementById("history-modal");
+    if (modal) {
+        modal.classList.toggle("hidden");
+        if (!modal.classList.contains("hidden")) {
+            renderHistory();
+        }
+    }
+}
+
+function addHistory(gameName, bet, win) {
+    if (!currentUser) return;
+    if (!currentUser.history) currentUser.history = [];
+
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+    const entry = {
+        game: gameName,
+        bet: bet,
+        win: win,
+        time: timeString
+    };
+
+    // Yeni kaydı en başa ekle (son 20 kaydı tut)
+    currentUser.history.unshift(entry);
+    if (currentUser.history.length > 20) currentUser.history.pop();
+    
+    saveData();
+    renderHistory();
+}
+
+function renderHistory() {
+    const tableBody = document.getElementById('game-history-body');
+    if (!tableBody || !currentUser || !currentUser.history) return;
+
+    tableBody.innerHTML = "";
+    
+    if(currentUser.history.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan='4' class='empty-history'>Henüz oyun oynanmadı.</td></tr>";
+        return;
+    }
+
+    currentUser.history.forEach(h => {
+        let profit = h.win - h.bet;
+        let resultClass = "";
+        let resultText = "";
+
+        if (profit >= 0 && h.win > 0) {
+            resultClass = "result-win";
+            resultText = `+${h.win} TL`;
+        } else {
+            resultClass = "result-lose";
+            resultText = `-${h.bet} TL`; 
+            if(h.win > 0 && h.win < h.bet) {
+                 resultText = `-${h.bet - h.win} TL`; 
+            }
+        }
+
+        const row = `
+            <tr>
+                <td>${h.game}</td>
+                <td>${h.bet} TL</td>
+                <td class="${resultClass}">${resultText}</td>
+                <td style="color:#bdc3c7;">${h.time}</td>
+            </tr>
+        `;
+        tableBody.innerHTML += row;
     });
 }
 
@@ -83,7 +154,7 @@ function registerUser() {
         errorMsg.innerText = "Kullanıcı adı alınmış!"; return;
     }
 
-    const newUser = { userid: Math.floor(Math.random() * 100000), username, password, email, balance: initialBalance };
+    const newUser = { userid: Math.floor(Math.random() * 100000), username, password, email, balance: initialBalance, history: [] };
     users.push(newUser);
     saveData();
     
@@ -101,6 +172,7 @@ function login() {
 
     if (user && user.password === passInp) {
         currentUser = user;
+        if (!currentUser.history) currentUser.history = [];
         showGameScreen();
         errorMsg.innerText = "";
     } else {
@@ -126,6 +198,10 @@ function updateGlobalBalance() {
 
 function openGame(gameName) {
     document.getElementById('lobby-view').classList.add('hidden');
+    // Geçmiş butonunu oyun içindeyken gizle, lobide göster
+    const histBtn = document.querySelector('.history-btn-fixed');
+    if(histBtn) histBtn.style.display = 'none';
+
     if (gameName === 'slot') {
         document.getElementById('view-slot').classList.remove('hidden');
         updateDisplay();
@@ -135,7 +211,7 @@ function openGame(gameName) {
         document.getElementById('view-roulette').classList.remove('hidden');
         createWheel();
         updateRouletteUI();
-        setTimeout(startTutorial, 500); // Oyunu açınca öğreticiyi başlat
+        setTimeout(startTutorial, 500); 
     }
 }
 
@@ -144,6 +220,12 @@ function backToLobby() {
     document.getElementById('view-bj').classList.add('hidden');
     document.getElementById('view-roulette').classList.add('hidden');
     document.getElementById('lobby-view').classList.remove('hidden');
+    
+    // Lobiye dönünce butonu geri getir
+    const histBtn = document.querySelector('.history-btn-fixed');
+    if(histBtn) histBtn.style.display = 'block';
+    
+    renderHistory();
 }
 
 /* =========================================
@@ -249,6 +331,8 @@ function checkWin() {
     const rValues = Array.from(row2Slots).map(slot => slot.innerText);
     
     let multiplier = 0;
+    let winAmount = 0;
+
     if (rValues[0] === rValues[1] && rValues[1] === rValues[2]) {
         if (rValues[0] === "7️⃣") multiplier = 100;
         else if (rValues[0] === "💎") multiplier = 50;
@@ -258,13 +342,15 @@ function checkWin() {
     }
 
     if (multiplier > 0) {
-        let winAmount = betAmount * multiplier;
+        winAmount = betAmount * multiplier;
         currentUser.balance += winAmount;
         updateDisplay();
         document.getElementById("win-val").innerText = winAmount;
         try { if(winSound) { winSound.currentTime = 0; winSound.play().catch(e => {}); } } catch(e){}
         showWinCelebration(multiplier);
     }
+    
+    addHistory("VIP Slots", betAmount, winAmount);
 }
 
 function showWinCelebration(multiplier) {
@@ -293,7 +379,6 @@ function showWinCelebration(multiplier) {
 const Suits = ["♥", "♦", "♣", "♠"];
 const Ranks = { "A": 11, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "J": 10, "Q": 10, "K": 10 };
 
-// Ses Efektleri (sounds/ klasörüne göre ayarlandı)
 const bjSounds = {
     deal: new Audio('sounds/dealbj.mp3'),
     win: new Audio('sounds/winbj.wav'),
@@ -333,6 +418,8 @@ class Hand {
 }
 
 let bjDeck, playerHands, dealerHand, curIdx, isPlaying = false, bjCurrentBet = 0, isProcessing = false;
+let bjTotalRoundBet = 0;
+
 const wait = (ms) => new Promise(res => setTimeout(res, ms));
 
 function drawCard(card, hide = false, anime = false) {
@@ -399,6 +486,7 @@ async function startBlackjack() {
     isProcessing = true;
     currentUser.balance -= betValue;
     bjCurrentBet = betValue;
+    bjTotalRoundBet = betValue; 
     isPlaying = true;
     
     bjDeck = new Deck(); dealerHand = new Hand(); playerHands = [new Hand()]; curIdx = 0;
@@ -451,6 +539,8 @@ async function doubleDownBlackjack() {
     isProcessing = true;
     currentUser.balance -= bjCurrentBet; 
     bjCurrentBet *= 2;
+    bjTotalRoundBet += (bjCurrentBet / 2);
+    
     playerHands[curIdx].add(bjDeck.deal());
     playSoundBJ('deal');
     updateBJUI(false, true);
@@ -463,6 +553,7 @@ async function splitHandBlackjack() {
     if(currentUser.balance < bjCurrentBet) { alert("Bakiyeniz yetersiz!"); return; }
     isProcessing = true;
     currentUser.balance -= bjCurrentBet;
+    bjTotalRoundBet += bjCurrentBet; 
     
     let currentHand = playerHands[curIdx];
     let splitCard = currentHand.cards.pop();
@@ -479,9 +570,7 @@ async function splitHandBlackjack() {
 async function dealerTurn() {
     isPlaying = false;
     updateBJUI(true); await wait(800);
-    
     const allBust = playerHands.every(h => h.score() > 21);
-    
     if (!allBust) {
         while(dealerHand.score() < 17) {
             dealerHand.add(bjDeck.deal());
@@ -495,6 +584,7 @@ async function dealerTurn() {
 function finishBlackjack() {
     let d = dealerHand.score();
     let soundToPlay = "lose";
+    let totalRoundWin = 0;
 
     playerHands.forEach((h) => {
         let p = h.score();
@@ -520,6 +610,7 @@ function finishBlackjack() {
 
         if(winAmount > 0) {
             currentUser.balance += winAmount;
+            totalRoundWin += winAmount;
         }
     });
 
@@ -527,6 +618,8 @@ function finishBlackjack() {
     playSoundBJ(soundToPlay);
     updateBJUI(true);
     isProcessing = false;
+    
+    addHistory("Blackjack", bjTotalRoundBet, totalRoundWin);
 }
 
 /* =========================================
@@ -539,7 +632,6 @@ const WHEEL_NUMBERS = [
 const RED_NUMBERS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 const SLICE_ANGLE = 360 / 37; 
 
-// Rulet Sesi Fonksiyonu (Düzeltildi)
 function playSoundRoulette(name) {
     let soundEl;
     if (name === 'bet') soundEl = document.getElementById('rouletteBetSound');
@@ -549,7 +641,7 @@ function playSoundRoulette(name) {
     if (soundEl) {
         soundEl.currentTime = 0;
         soundEl.volume = 0.5;
-        soundEl.play().catch(e => console.log("Rulet sesi hatası:", e));
+        soundEl.play().catch(e => console.log("Rulet sesi çalma hatası:", e));
     }
 }
 
@@ -624,7 +716,7 @@ function placeBetOnTable(selection, btnElement) {
     if (myGame.addBet(selection, betAmount)) {
         addVisualChip(btnElement, activeChipMultiplier);
         updateRouletteUI();
-        playSoundRoulette('bet'); // Bahis sesi
+        playSoundRoulette('bet');
     }
 }
 
@@ -660,10 +752,12 @@ function startRouletteGame() {
     const overlay = document.getElementById('winnerOverlay');
     const winnerText = document.getElementById('winnerText');
 
+    const currentTotalBet = myGame.currentBets.reduce((sum, bet) => sum + bet.amount, 0);
+
     spinBtn.disabled = true;
     overlay.classList.add('hidden');
 
-    playSoundRoulette('spin'); // Çevirme sesi
+    playSoundRoulette('spin');
 
     const winningNum = myGame.spinLogic();
     const winIndex = WHEEL_NUMBERS.indexOf(winningNum);
@@ -679,7 +773,7 @@ function startRouletteGame() {
     currentRotation = newTotalRotation;
 
     setTimeout(() => {
-        playSoundRoulette('win'); // Sonuç sesi
+        playSoundRoulette('win');
         
         const resultData = myGame.checkAllBets();
         let color = '#388e3c';
@@ -693,6 +787,8 @@ function startRouletteGame() {
         const statusMsg = document.getElementById('statusMessage');
         if (resultData.totalWin > 0) statusMsg.innerHTML = `KAZANDINIZ! <b style="color:#f1c40f">${resultData.totalWin}</b> Puan`;
         else statusMsg.innerText = "Kaybettiniz.";
+
+        addHistory("Elite Rulet", currentTotalBet, resultData.totalWin);
 
         myGame.clearBets();
         document.querySelectorAll('.placed-chip').forEach(el => el.remove());
@@ -744,4 +840,56 @@ function startTutorial() {
         ]
     });
     driverObj.drive();
+}
+/* =========================================
+   --- TAM EKRAN RESİM FONKSİYONLARI --- 
+   ========================================= */
+
+// Resmi tam ekran açan fonksiyon
+function openImageModal(imageSrc) {
+    const modal = document.getElementById('image-modal-overlay');
+    const modalImg = document.getElementById('full-screen-image');
+    
+    // Tıklanan resmin yolunu modal içindeki resme ver
+    modalImg.src = imageSrc;
+    
+    // Modalı görünür yap
+    modal.classList.remove('hidden');
+}
+
+// Tam ekran modalı kapatan fonksiyon
+// (Hem çarpıya hem de resim dışındaki boşluğa tıklayınca çalışır)
+function closeImageModal() {
+    const modal = document.getElementById('image-modal-overlay');
+    const modalImg = document.getElementById('full-screen-image');
+
+    // Modalı gizle
+    modal.classList.add('hidden');
+    
+    // Kapanırken eski resmi temizle (bir sonrakine hazır olsun)
+    setTimeout(() => {
+        modalImg.src = "";
+    }, 300); // CSS geçiş süresi kadar bekle
+}
+
+// Resmin kendisine tıklanınca kapanmasını engelle (sadece arka plana tıklayınca kapansın)
+document.addEventListener('DOMContentLoaded', function() {
+    const modalImg = document.getElementById('full-screen-image');
+    if(modalImg) {
+        modalImg.addEventListener('click', function(e) {
+            e.stopPropagation(); // Tıklama olayının yukarı (overlay'e) gitmesini engelle
+        });
+    }
+});
+// --- TEST İÇİN DIŞA AKTARMA (Module Exports) ---
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { 
+        Roulette, 
+        Deck, 
+        Hand, 
+        generatePool, 
+        weightedPool, 
+        symbolWeights,
+        // Global değişkenleri testte manipüle etmek gerekirse buraya eklenebilir
+    };
 }

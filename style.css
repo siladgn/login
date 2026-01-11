@@ -480,4 +480,55 @@ button:disabled { filter: grayscale(100%); cursor: not-allowed; opacity: 0.7; }
     .neon-text { font-size: 20px; letter-spacing: 5px; }
     .gold-text { font-size: 40px; }
     .intro-sub { font-size: 10px; letter-spacing: 4px; }
+}/* --- TAM EKRAN RESİM MODALI STİLLERİ --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95); /* Çok koyu arka plan */
+    z-index: 2000; /* Her şeyin üstünde olsun */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* "hidden" sınıfı kaldırıldığında görünür yap */
+.modal-overlay:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+#full-screen-image {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain; /* Resim bozulmadan sığsın */
+    border: 3px solid #f1c40f; /* Altın çerçeve */
+    box-shadow: 0 0 30px rgba(241, 196, 15, 0.5);
+    border-radius: 10px;
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
+/* Açılınca hafif bir büyüme efekti */
+.modal-overlay:not(.hidden) #full-screen-image {
+    transform: scale(1);
+}
+
+.close-image-btn {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 40px;
+    color: #f1c40f;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-image-btn:hover {
+    color: white;
 }
