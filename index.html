@@ -490,6 +490,13 @@
             <h2 id="wallet-title" style="color:#f1c40f; font-family:'Cinzel'; margin-bottom: 20px;">
                 CÜZDAN YÖNETİMİ
             </h2>
+            <div class="currency-converter" style="margin-bottom: 20px; padding: 10px; border: 1px ridge #f1c40f; border-radius: 10px; background: rgba(241, 196, 15, 0.05);">
+    <label style="color:#f1c40f; font-size: 12px; display: block; margin-bottom: 10px;">DÖVİZ BOZDUR (GÜNCEL KUR)</label>
+    <div style="display: flex; gap: 10px; justify-content: center;">
+        <button onclick="confirmCurrencyExchange('USD')" class="quick-amounts" style="background: #27ae60; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 5px;">$ USD Sat (30 TL)</button>
+        <button onclick="confirmCurrencyExchange('EUR')" class="quick-amounts" style="background: #2980b9; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 5px;">€ EUR Sat (33 TL)</button>
+    </div>
+</div>
 
             <div class="wallet-tabs">
                 <button id="tab-deposit" class="tab-btn active" onclick="switchWalletTab('deposit')">PARA YATIR</button>
@@ -571,6 +578,27 @@
     <audio id="rouletteWinSound" src="sounds/slotstop.mp3"></audio>
 
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+    <div id="history-modal" class="modal hidden">
+    <div class="modal-content history-modal-content">
+        <span class="close-btn" onclick="toggleHistory()">&times;</span>
+        <h2 style="color:#f1c40f; text-align:center; font-family:'Cinzel';">OYUN GEÇMİŞİ</h2>
+        
+        <div style="max-height: 400px; overflow-y: auto;">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>OYUN</th>
+                        <th>BAHİS</th>
+                        <th>KAZANÇ</th>
+                        <th>TARİH</th>
+                    </tr>
+                </thead>
+                <tbody id="game-history-body">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
     <script type="module" src="script.js"></script>
 </body>
 </html>

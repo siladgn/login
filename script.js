@@ -20,6 +20,48 @@ const usersCollection = collection(db, "users");
 
 let currentUser = null; 
 let currentUserDocId = null;
+// Döviz kurlarını tanımla
+const EXCHANGE_RATES = {
+    USD: 30.0,
+    EUR: 33.0
+};
+
+// Onaylamalı Döviz Çevirme Fonksiyonu
+window.confirmCurrencyExchange = async function(currency) {
+    const amount = prompt(`${currency} miktarını giriniz:`);
+    
+    if (amount === null || amount === "" || isNaN(amount) || amount <= 0) {
+        alert("Geçersiz miktar girdiniz!");
+        return;
+    }
+
+    const rate = EXCHANGE_RATES[currency];
+    const totalTRY = parseFloat(amount) * rate;
+
+    // Onay Kutusu (Onaylamalı olması için)
+    const isConfirmed = confirm(`${amount} ${currency} bozdurularak hesabınıza ${totalTRY} TL eklenecektir. Onaylıyor musunuz?`);
+
+    if (isConfirmed) {
+        if (!currentUser) return;
+
+        currentUser.balance += totalTRY;
+        
+        // Geçmişe ekle
+        addHistory("Döviz Bozdurma", 0, totalTRY);
+        
+        // Firebase ve Arayüz Güncelleme
+        await updateUserDataInFirebase();
+        updateGlobalBalance();
+        
+        alert(`İşlem başarılı! Yeni bakiyeniz: ${currentUser.balance} TL`);
+        
+        const msg = document.getElementById("wallet-msg");
+        if(msg) {
+            msg.style.color = "#2ecc71";
+            msg.innerText = `${amount} ${currency} başarıyla TL'ye çevrildi.`;
+        }
+    }
+};
 
 // --- YÜKLEME VE GÖRSEL AYARLAR ---
 window.addEventListener('load', function() {
@@ -684,3 +726,6 @@ function updateRouletteUI() { updateGlobalBalance(); document.getElementById('ba
 window.startRouletteGame = function() { if (myGame.currentBets.length === 0) { alert("Lütfen bahis yapın!"); return; } const spinBtn = document.getElementById('spinButton'); const wheel = document.getElementById('rouletteWheel'); const overlay = document.getElementById('winnerOverlay'); const winnerText = document.getElementById('winnerText'); const currentTotalBet = myGame.currentBets.reduce((sum, bet) => sum + bet.amount, 0); spinBtn.disabled = true; overlay.classList.add('hidden'); playSoundRoulette('spin'); const winningNum = myGame.spinLogic(); const winIndex = WHEEL_NUMBERS.indexOf(winningNum); const pieceAngle = 360 / 37; const winningAngle = winIndex * pieceAngle + (pieceAngle / 2); const targetRotationInCircle = (360 - winningAngle); const currentMod = currentRotation % 360; let distance = (targetRotationInCircle - currentMod + 360) % 360; const extraSpins = 360 * 5; const newTotalRotation = currentRotation + extraSpins + distance; wheel.style.transform = `rotate(${newTotalRotation}deg)`; currentRotation = newTotalRotation; setTimeout(() => { playSoundRoulette('win'); const resultData = myGame.checkAllBets(); let color = '#388e3c'; if(RED_NUMBERS.includes(resultData.resultNum)) color = '#d32f2f'; else if(resultData.resultNum !== 0) color = '#212121'; winnerText.style.backgroundColor = color; winnerText.innerText = resultData.resultNum; overlay.classList.remove('hidden'); const statusMsg = document.getElementById('statusMessage'); if (resultData.totalWin > 0) statusMsg.innerHTML = `KAZANDINIZ! <b style="color:#f1c40f">${resultData.totalWin}</b> Puan`; else statusMsg.innerText = "Kaybettiniz."; updateUserDataInFirebase(); addHistory("Elite Rulet", currentTotalBet, resultData.totalWin); myGame.clearBets(); document.querySelectorAll('.placed-chip').forEach(el => el.remove()); updateRouletteUI(); spinBtn.disabled = false; }, 4000); };
 function createWheel() { const wheel = document.getElementById('rouletteWheel'); wheel.innerHTML = ''; const textRadius = 125; WHEEL_NUMBERS.forEach((num, index) => { const slice = document.createElement('div'); slice.className = 'number-text'; const theta = index * SLICE_ANGLE + (SLICE_ANGLE / 2); slice.style.transform = `rotate(${theta}deg) translateY(-${textRadius}px)`; const span = document.createElement('span'); span.innerText = num; span.className = 'number-span'; slice.appendChild(span); wheel.appendChild(slice); }); let gradient = 'conic-gradient('; WHEEL_NUMBERS.forEach((num, index) => { let color = '#388e3c'; if (RED_NUMBERS.includes(num)) color = '#d32f2f'; else if (num !== 0) color = '#212121'; gradient += `${color} ${index * SLICE_ANGLE}deg ${(index + 1) * SLICE_ANGLE}deg, `; }); wheel.style.background = gradient.slice(0, -2) + ')'; }
 function startTutorial() { const driver = window.driver.js.driver; const driverObj = driver({ showProgress: true, allowClose: true, nextBtnText: 'İleri >', prevBtnText: '< Geri', doneBtnText: 'Oyuna Başla!', steps: [ { element: '.roulette-game-area', popover: { title: 'Casino Royale\'e Hoşgeldiniz!', description: 'Rulet oyununun nasıl oynandığını öğrenmek için kısa bir tura ne dersiniz?', side: "left", align: 'start' } }, { element: '#tutorial-step-1', popover: { title: '1. Adım: Birim Fiyat', description: 'Buraya temel bahis miktarınızı girin. Örneğin 10 yazarsanız, x1 çipi 10 puan değerinde olur.', side: "bottom", align: 'start' } }, { element: '#tutorial-step-2', popover: { title: '2. Adım: Çip Katlayıcı', description: 'Risk almak ister misiniz? Buradan x2, x5 veya x100 gibi katlayıcıları seçebilirsiniz.', side: "bottom", align: 'start' } }, { element: '#tutorial-step-3', popover: { title: '3. Adım: Bahis Masası', description: 'Seçtiğiniz çipleri masadaki sayıların üzerine tıklayarak yerleştirin. İstediğiniz kadar sayıya oynayabilirsiniz!', side: "left", align: 'start' } }, { element: '#spinButton', popover: { title: '4. Adım: Çevir!', description: 'Bahislerinizi koyduktan sonra bu butona basın ve şansınızı deneyin. Bol şans!', side: "top", align: 'center' } }, { element: '#tutorial-step-3', popover: { title: '📜 Oyun Kuralları ve Kazançlar', description: `<ul style="margin: 0; padding-left: 20px; text-align: left;"><li style="margin-bottom:5px;"><b>Tek Sayı (Örn: 5):</b> Bahsin 36 Katı (x36)</li><li style="margin-bottom:5px;"><b>12'li Gruplar (1st 12):</b> Bahsin 3 Katı (x3)</li><li style="margin-bottom:5px;"><b>Renk / Tek-Çift:</b> Bahsin 2 Katı (x2)</li></ul><p style="margin-top:10px; font-size:12px; font-style:italic;">Dikkat: Yeşil 0 gelirse dış bahisler (Renk, Tek/Çift) kaybeder!</p>`, side: "left", align: 'center' } } ] }); driverObj.drive(); }
+
+
+export { Roulette, Deck, Hand, generatePool, weightedPool };
