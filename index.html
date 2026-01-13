@@ -213,7 +213,15 @@
         <h1 class="casino-title" style="font-size: 32px;">KAYIT OL</h1>
         <input type="text" id="reg-username" placeholder="Kullanıcı Adı">
         <input type="email" id="reg-email" placeholder="E-posta">
-        <input type="text" id="reg-credit" placeholder="Kredi Kartı No">
+        
+        <div class="reg-card-group" style="margin-bottom: 5px;">
+            <input type="text" id="reg-credit" placeholder="Kredi Kartı No" maxlength="19">
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="reg-card-date" placeholder="SKT (AA/YY)" maxlength="5" style="flex:1;">
+                <input type="text" id="reg-cvv" placeholder="CVV" maxlength="3" style="flex:1;">
+            </div>
+        </div>
+
         <input type="number" id="reg-amount" placeholder="Yüklenecek Tutar (TL)" min="1">
         <input type="password" id="reg-password" placeholder="Şifre">
         <button onclick="registerUser()" class="pulse-btn">HESAP OLUŞTUR</button>
@@ -234,10 +242,22 @@
                 <i class="fa-solid fa-crown" style="color:#f1c40f;"></i> 
                 <span id="welcome-msg" style="color:white; font-weight:bold;">Misafir</span>
             </div>
+            
             <div class="right-panel">
-                <div class="balance-box">
-                    <i class="fa-solid fa-wallet"></i> <span id="balance">0</span> TL
+                <div class="wallet-controls">
+                    <button onclick="openWalletModal('withdraw')" class="wallet-btn w-btn-minus" title="Para Çek">
+                        <i class="fa-solid fa-minus"></i>
+                    </button>
+                    
+                    <div class="balance-box">
+                        <i class="fa-solid fa-wallet"></i> <span id="balance">0</span> TL
+                    </div>
+
+                    <button onclick="openWalletModal('deposit')" class="wallet-btn w-btn-plus" title="Para Yatır">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
                 </div>
+
                 <button onclick="location.reload()" class="header-logout-btn" title="Güvenli Çıkış">
                     <i class="fa-solid fa-power-off"></i>
                 </button>
@@ -274,7 +294,7 @@
             <div class="slot-machine-wrapper">
                 <div class="game-container">
                     <div class="top-bar-slot">
-                        <div class="game-title-slot" data-text="PASHA SLOT">PASHA SLOT</div>
+                        <div class="game-title-slot" data-text="VIP SLOT">VIP SLOT</div>
                     </div>
                     <div class="main-frame">
                         <div class="screen-window">
@@ -463,25 +483,55 @@
 
     </div>
 
-    <div id="history-modal" class="modal hidden">
-        <div class="modal-content history-modal-content">
-            <span class="close-btn" onclick="toggleHistory()">&times;</span>
-            <h2 style="color:#f1c40f; text-align:center; margin-bottom:20px; font-family:'Cinzel';">
-                <i class="fa-solid fa-clock-rotate-left"></i> OYUN GEÇMİŞİ
+    <div id="wallet-modal" class="modal hidden">
+        <div class="modal-content wallet-modal-content">
+            <span class="close-btn" onclick="toggleWalletModal()">&times;</span>
+            
+            <h2 id="wallet-title" style="color:#f1c40f; font-family:'Cinzel'; margin-bottom: 20px;">
+                CÜZDAN YÖNETİMİ
             </h2>
-            <div style="max-height: 400px; overflow-y: auto;">
-                <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th>OYUN</th>
-                            <th>BAHİS</th>
-                            <th>SONUÇ</th>
-                            <th>ZAMAN</th>
-                        </tr>
-                    </thead>
-                    <tbody id="game-history-body">
-                        </tbody>
-                </table>
+
+            <div class="wallet-tabs">
+                <button id="tab-deposit" class="tab-btn active" onclick="switchWalletTab('deposit')">PARA YATIR</button>
+                <button id="tab-withdraw" class="tab-btn" onclick="switchWalletTab('withdraw')">PARA ÇEK</button>
+            </div>
+
+            <div class="wallet-body">
+                <p id="wallet-desc" style="color:#ccc; margin-bottom:15px;">Hesabınıza güvenli bir şekilde bakiye yükleyin.</p>
+                
+                <div class="input-group-wallet">
+                    <i class="fa-solid fa-turkish-lira-sign"></i>
+                    <input type="number" id="wallet-amount" placeholder="Tutar Giriniz" min="10">
+                </div>
+
+                <div class="quick-amounts">
+                    <button onclick="setWalletAmount(100)">100</button>
+                    <button onclick="setWalletAmount(500)">500</button>
+                    <button onclick="setWalletAmount(1000)">1000</button>
+                    <button onclick="setWalletAmount(5000)">5000</button>
+                </div>
+                
+                <div class="card-form-section" style="margin-top:20px; text-align:left;">
+                    <label style="color:#f1c40f; font-size:12px; margin-left:5px;">Kredi Kartı Bilgileri</label>
+                    <div class="input-group-wallet" style="margin-bottom:10px;">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <input type="text" id="w-card-no" placeholder="0000 0000 0000 0000" maxlength="19">
+                    </div>
+                    
+                    <div style="display:flex; gap:10px;">
+                        <div class="input-group-wallet" style="flex:1;">
+                            <i class="fa-regular fa-calendar"></i>
+                            <input type="text" id="w-card-date" placeholder="AA/YY" maxlength="5">
+                        </div>
+                        <div class="input-group-wallet" style="flex:1;">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="text" id="w-cvv" placeholder="CVV" maxlength="3">
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="processWalletTransaction()" class="pulse-btn" style="width:100%; margin-top:10px;">İŞLEMİ ONAYLA</button>
+                <p id="wallet-msg" class="error" style="margin-top:10px;"></p>
             </div>
         </div>
     </div>
@@ -521,6 +571,6 @@
     <audio id="rouletteWinSound" src="sounds/slotstop.mp3"></audio>
 
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
