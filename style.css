@@ -654,3 +654,44 @@ button:disabled { filter: grayscale(100%); cursor: not-allowed; opacity: 0.7; }
 .hidden {
     display: none !important;
 }
+/* Kartların dizildiği satır */
+.cards-row {
+    display: flex;
+    justify-content: center;
+    gap: -40px; /* Kartların hafifçe üst üste binmesi için negatif değer */
+    min-height: 120px;
+    margin: 10px 0;
+    position: relative;
+}
+
+/* Tekil kart stili */
+.card {
+    width: 80px;
+    height: 115px;
+    background: white;
+    color: black;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    font-weight: bold;
+    font-size: 20px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    border: 1px solid #ccc;
+    position: relative;
+    /* Kartların soldan sağa doğru birbirinin üzerine binmesini sağlar */
+    margin-left: -35px; 
+    transition: transform 0.2s ease;
+    z-index: 1;
+}
+
+/* İlk kartın sola kaymasını engelle */
+.card:first-child {
+    margin-left: 0;
+}
+
+/* Kartların geliş animasyonu sırasında z-index çakışmasını önle */
+.card-anim {
+    animation: cardDrop 0.4s ease-out forwards;
+}

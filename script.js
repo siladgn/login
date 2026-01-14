@@ -714,9 +714,65 @@ const WHEEL_NUMBERS = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 3
 const RED_NUMBERS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 const SLICE_ANGLE = 360 / 37; 
 function playSoundRoulette(name) { let soundEl; if (name === 'bet') soundEl = document.getElementById('rouletteBetSound'); else if (name === 'spin') soundEl = document.getElementById('rouletteSpinSound'); else if (name === 'win') soundEl = document.getElementById('rouletteWinSound'); if (soundEl) { soundEl.currentTime = 0; soundEl.volume = 0.5; soundEl.play().catch(e => console.log("Rulet sesi çalma hatası:", e)); } }
-class Roulette { constructor() { this.currentBets = []; } addBet(selection, amount) { if (amount > currentUser.balance) { alert("Bakiye yetersiz!"); return false; } currentUser.balance -= amount; this.currentBets.push({ selection: selection, amount: amount }); return true; } spinLogic() { this.lastWinningNumber = Math.floor(Math.random() * 37); return this.lastWinningNumber; } checkAllBets() { const result = this.lastWinningNumber; let totalWin = 0; this.currentBets.forEach(bet => { let winMultiplier = 0; const guess = bet.selection; if (typeof guess === 'number' && guess === result) { winMultiplier = 36; } else if (result !== 0 && typeof guess === 'string') { const isRed = RED_NUMBERS.includes(result); const isEven = result % 2 === 0; if ((guess === 'RED' && isRed) || (guess === 'BLACK' && !isRed) || (guess === 'EVEN' && isEven) || (guess === 'ODD' && !isEven)) { winMultiplier = 2; } else if ((guess === '1ST12' && result >= 1 && result <= 12) || (guess === '2ND12' && result >= 13 && result <= 24) || (guess === '3RD12' && result >= 25 && result <= 36)) { winMultiplier = 3; } } totalWin += (bet.amount * winMultiplier); }); currentUser.balance += totalWin; updateGlobalBalance(); return { totalWin: totalWin, resultNum: result }; } clearBets() { this.currentBets = []; } }
-const myGame = new Roulette();
+class Roulette {
+    constructor() { this.currentBets = []; }
+
+    addBet(selection, amount) {
+        // Test ortamında currentUser null gelebileceği için kontrol ekliyoruz
+        if (!global.currentUser && typeof currentUser === 'undefined') return false;
+        
+        const user = global.currentUser || currentUser;
+        
+        if (amount > user.balance) {
+            alert("Bakiye yetersiz!");
+            return false;
+        }
+        user.balance -= amount;
+        this.currentBets.push({ selection: selection, amount: amount });
+        return true;
+    }
+
+    spinLogic() {
+        this.lastWinningNumber = Math.floor(Math.random() * 37);
+        return this.lastWinningNumber;
+    }
+
+    checkAllBets() {
+        const result = this.lastWinningNumber;
+        let totalWin = 0;
+        const user = global.currentUser || currentUser;
+
+        this.currentBets.forEach(bet => {
+            let winMultiplier = 0;
+            const guess = bet.selection;
+
+            if (typeof guess === 'number' && guess === result) {
+                winMultiplier = 36;
+            } else if (result !== 0 && typeof guess === 'string') {
+                const isRed = RED_NUMBERS.includes(result);
+                const isEven = result % 2 === 0;
+
+                if ((guess === 'RED' && isRed) || (guess === 'BLACK' && !isRed) || 
+                    (guess === 'EVEN' && isEven) || (guess === 'ODD' && !isEven)) {
+                    winMultiplier = 2;
+                } else if ((guess === '1ST12' && result >= 1 && result <= 12) || 
+                           (guess === '2ND12' && result >= 13 && result <= 24) || 
+                           (guess === '3RD12' && result >= 25 && result <= 36)) {
+                    winMultiplier = 3;
+                }
+            }
+            totalWin += (bet.amount * winMultiplier);
+        });
+
+        user.balance += totalWin;
+        if (typeof updateGlobalBalance === 'function') updateGlobalBalance();
+        return { totalWin: totalWin, resultNum: result };
+    }
+
+    clearBets() { this.currentBets = []; }
+}
 let currentRotation = 0;
+
 let activeChipMultiplier = 1;
 window.selectChip = function(multiplier) { activeChipMultiplier = multiplier; document.querySelectorAll('.chip-select').forEach(el => el.classList.remove('selected-chip')); document.querySelector(`.chip-${multiplier}`).classList.add('selected-chip'); };
 window.placeBetOnTable = function(selection, btnElement) { const baseUnit = parseInt(document.getElementById('baseUnitInput').value); if(isNaN(baseUnit) || baseUnit < 1) { alert("Geçerli birim fiyat girin."); return; } const betAmount = baseUnit * activeChipMultiplier; if (myGame.addBet(selection, betAmount)) { addVisualChip(btnElement, activeChipMultiplier); updateRouletteUI(); playSoundRoulette('bet'); } };
